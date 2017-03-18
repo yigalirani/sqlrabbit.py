@@ -1,4 +1,4 @@
-import pystache
+﻿import pystache
 from flask import Flask,session,redirect,url_for,send_from_directory,request,g
 import MySQLdb
 import MySQLdb.cursors
@@ -12,11 +12,11 @@ app = Flask(__name__)
 app.secret_key = 'sdh'
 
 nav_copy_fields=['sort', 'database', 'query', 'table', 'dir']
-max_rows=10
+max_rows=1000
 
 def get_connection(connp):
     try:
-        mydb = MySQLdb.connect(cursorclass=MySQLdb.cursors.DictCursor,**connp)
+        mydb = MySQLdb.connect(cursorclass=MySQLdb.cursors.DictCursor,charset='utf8',use_unicode=True,**connp)
         return mydb,None
     except Exception as ex:
         return None,str(ex)
@@ -62,7 +62,7 @@ def decorate(val):
     return val
 
 def print_val_td(val):
-    return '<td>'+decorate(str(val))+'</td>'
+    return '<td>'+decorate(unicode(val))+'</td>'
 
 def print_next_prev(print_next):
     def print_link(title,should_print,start):
@@ -156,7 +156,7 @@ def query_and_send(view):
         view2 = calc_view2(results, fields, error);
         view.logout_href=make_url({'endpoint':'logout'})
         view.conn_p = read_connp();
-        ans=render('templates/template.htm', view,view2)
+        ans=render('templates/template.htm', view,view2,g.args)
         connection.close()
         return ans
     connection,error=get_connection(read_connp())
